@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBac Quiz</title>
+    <!-- Add Bootstrap CSS link here -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        hr.select-divider {
+            border: none;
+            border-top: 1px solid #000;
+            margin: 5px 0;
+        }
+    </style>
+
+<script src="https://editor.codecogs.com/eqneditor.api.min.js" 
+crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <br><br><br><b></b>
+        <h2>MYBAC QUIZ CREATOR</h2>
+        <form id="quiz-form">
+            <div class="form-group">
+                <label for="quizName">Nom du Quiz :</label>
+                <input type="text" class="form-control" id="quizName" required>
+            </div>
+            <div class="form-group">
+                <label for="quizLevel">Niveau du Quiz :</label>
+                <select class="form-control" id="quizLevel" required>
+                    
+                </select>
+            </div>
+            <div class="form-group" id="subjectDropdownGroup" style="display: none;">
+                <label for="quizSubject">Sujet :</label>
+                <select class="form-control" id="quizSubject" required>
+                    <option value="" disabled selected>Sélectionnez un sujet</option>
+                    <!-- Les sujets seront ajoutés ici dynamiquement -->
+                </select>
+            </div>
+            <div class="form-group" id="courseDropdownGroup" style="display: none;">
+                <label for="quizCourse">Cours :</label>
+                <select class="form-control" id="quizCourse" required>
+                    <option value="" disabled selected>Sélectionnez un cours</option>
+                    <!-- Les cours seront ajoutés ici dynamiquement -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quizTime">Durée :</label>
+                <input type="text" class="form-control" id="quizTime" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="quizDifficulty">Difficulté :</label>
+                <select class="form-control" id="quizDifficulty" required>
+                    <option value="level1">Niveau 1</option>
+                    <option value="level2">Niveau 2</option>
+                    <option value="level3">Niveau 3</option>
+                    <option value="level4">Niveau 4</option>
+                    <option value="level5">Niveau 5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quizDescription">Description :</label>
+                <textarea class="form-control" id="quizDescription" rows="4" required></textarea>
+            </div>
+            <div class="form-group" id="questions-container">
+                <!-- Les questions seront ajoutées ici dynamiquement -->
+            </div>
+            
+            <button type="button" class="btn btn-primary" id="add-question">Ajouter une question</button>
+            
+            <button type="button" class="btn btn-danger" id="generate-quiz">Générer le Quiz JSON</button>
+            <a id="download-link" style="display: none" download="quiz.json" class="btn btn-success">Télécharger le Quiz</a>
+            <hr class="select-divider">
+            <div id="quizzes-to-export">
+                <h3>Quizzes à Exporter :</h3>
+                <ul></ul>
+            </div>    
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" id="export-quizzes">Exporter Tous les Quizzes</button>
+            </div>
+        </form>
+        <br><br><br><br>
+
+<div id="toolbar"></div>
+<div id="latexInput"></div>
+<img id="output"/>
+<script type="text/javascript">
+    textarea = new EqEditor.TextArea('latexInput')
+      .addToolbar(new EqEditor.Toolbar('toolbar'), true)
+      .addOutput(new EqEditor.Output('output'));
+</script>
+<div id="input" placeholder="Write LaTeX here"></div>
+<script>
+var ta = new EqEditor.TextArea('input', true);
+</script>
+<br><br><br><br><br><br><br><br><br>
+
+
+          
+        
+          <script>
+              const equationInput = document.getElementById("equationInput").value;
+              const renderedEquation = document.getElementById("renderedEquation");
+            function convertEquation() {
+        
+              if (equationInput.trim() === "") {
+                renderedEquation.innerHTML = "";
+              } else {
+                MathJax.texReset();
+                MathJax.typesetClear();
+                MathJax.typesetPromise([renderedEquation, equationInput])
+                  .catch((error) => {
+                    renderedEquation.innerHTML = "Error: " + error.message;
+                  });
+              }
+            }
+        
+            function generateExportedEquation() {
+              const equationInput = document.getElementById("equationInput").value;
+              // You can use equationInput for exporting or further processing
+              renderedEquation.innerHTML=convertEquation();
+              alert("Exported Equation: " + equationInput);
+            }
+          </script>
+          <script type="text/javascript" async
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+      </script>
+      <style>
+        .equation-container {
+          border: 1px solid #ddd;
+          padding: 10px;
+          width: 300px;
+        }
+      </style>
+
+    <!-- Add Bootstrap JS and jQuery scripts here if needed -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        function convertEquation() {
+          const equationInput = document.getElementById("equationInput").value;
+          const renderedEquation = document.getElementById("renderedEquation");
+    
+          if (equationInput.trim() === "") {
+            renderedEquation.innerHTML = "";
+          } else {
+            MathJax.texReset();
+            MathJax.typesetClear();
+            MathJax.typesetPromise([renderedEquation, equationInput])
+              .catch((error) => {
+                renderedEquation.innerHTML = "Error: " + error.message;
+              });
+          }
+        }
+    </script>
+
+    <script>
+        // Initialize question counter
+        let questionCounter = 0;
+
+        // Define a variable to store the quizzes
+        let quizzes = [];
+
+        // Function to update the list of quizzes to export
+        function updateQuizzesList() {
+            const list = document.querySelector("#quizzes-to-export ul");
+            list.innerHTML = "";
+
+            quizzes.forEach((quiz, index) => {
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+                    Quiz ${index + 1}: ${quiz.name}
+                    <button class="btn btn-primary edit-quiz" data-quiz-index="${index}">Edit</button>
+                    <button class="btn btn-danger delete-quiz" data-quiz-index="${index}">Delete</button>
+                `;
+                list.appendChild(listItem);
+            });
+        }
+
+        // Add a new question input field
+        $("#add-question").click(function () {
+            if (questionCounter < 20) {
+                questionCounter++;
+                const questionField = `
+                <hr>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="mathFormula${questionCounter}">Mathematical Formula:</label>
+                            <div id="mathFormula" style="border: 1px solid #ccc; padding: 5px;"></div>
+                        </div>
+                        <label for="question${questionCounter}">Question ${questionCounter}:</label>
+                        <input type="text" class="form-control" id="question${questionCounter}" required>
+                        <label for="answers${questionCounter}">Answers:</label>
+                        <div id="answers${questionCounter}">
+                            <!-- Answer options will be dynamically added here -->
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="add-answer${questionCounter}">Add Answer</button>
+                    </div>
+                `;
+                $("#questions-container").append(questionField);
+
+                // Add answer fields for the new question
+                $(`#add-answer${questionCounter}`).click(function () {
+                    const questionNumber = this.id.replace("add-answer", "");
+                    const answerNumber = $(`#answers${questionNumber} .form-check-input`).length + 1;
+                    const answerField = `
+                        <div class="form-check">
+                            <input type="text" class="form-control" id="answer${questionNumber}-${answerNumber}" placeholder="Answer" required>
+                            <input type="radio" class="form-check-input" name="correctAnswer${questionNumber}" value="${answerNumber}">
+                            <label class="form-check-label" for="correctAnswer${questionNumber}-${answerNumber}">Correct</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="text" class="form-control" id="answer${questionNumber}-${answerNumber}" placeholder="Answer" required>
+                            <input type="radio" class="form-check-input" name="correctAnswer${questionNumber}" value="${answerNumber}">
+                            <label class="form-check-label" for="correctAnswer${questionNumber}-${answerNumber}">Correct</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="text" class="form-control" id="answer${questionNumber}-${answerNumber}" placeholder="Answer" required>
+                            <input type="radio" class="form-check-input" name="correctAnswer${questionNumber}" value="${answerNumber}">
+                            <label class="form-check-label" for="correctAnswer${questionNumber}-${answerNumber}">Correct</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="text" class="form-control" id="answer${questionNumber}-${answerNumber}" placeholder="Answer" required>
+                            <input type="radio" class="form-check-input" name="correctAnswer${questionNumber}" value="${answerNumber}">
+                            <label class="form-check-label" for="correctAnswer${questionNumber}-${answerNumber}">Correct</label>
+                        </div>
+                    `;
+                    document.getElementById(`add-answer${questionCounter}`).style.display='none';
+                    $(`#answers${questionNumber}`).append(answerField);
+                });
+            }
+            updateQuizzesList(); // Update the list of quizzes
+
+            document.getElementById(`question${questionCounter}`).addEventListener("input",updateMathFormula(document.getElementById(`question${questionCounter}`).value,`mathFormula${questionCounter}`))
+        });
+
+        // Generate JSON when the "Generate Quiz JSON" button is clicked
+        $("#generate-quiz").click(function () {
+            const quizData = {
+                "_id": { "$oid": "64d8fedcb29e8d6426f1af50" },
+                "name": $("#quizName").val(),
+                "level": $("#quizLevel").val(),
+                "time": $("#quizTime").val(),
+                "difficulty": $("#quizDifficulty").val(),
+                "subject": $("#quizSubject").val(),
+                "Description": $("#quizDescription").val(),
+                "course": $("#quizCourse").val(),
+                "questions": []
+            };
+
+            for (let i = 1; i <= questionCounter; i++) {
+                const question = {
+                    "id": i,
+                    "question": $(`#question${i}`).val(),
+                    "answers": []
+                };
+
+                const correctAnswer = $(`input[name=correctAnswer${i}]:checked`).val();
+
+                for (let j = 1; j <= $(`#answers${i} .form-check-input`).length; j++) {
+                    question.answers.push({
+                        "answer": $(`#answer${i}-${j}`).val(),
+                        "trueAnswer": String(j) === correctAnswer
+                    });
+                }
+
+                quizData.questions.push(question);
+            }
+            quizzes.push(quizData);
+            updateQuizzesList(); // Update the list of quizzes
+        });
+
+        // Function to export all quizzes
+        function exportQuizzes() {
+            const allQuizzesJSON = JSON.stringify(quizzes, null, 2);
+
+            // Create a data URI for downloading the JSON
+            const blob = new Blob([allQuizzesJSON], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = "all_quizzes.json";
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        // Add a click event listener for the "Export All Quizzes" button
+        const exportButton = document.getElementById("export-quizzes");
+        exportButton.addEventListener("click", exportQuizzes);
+
+        // When the document is ready
+
+        // Function to update the BlockMaths rendering
+        function updateMathFormula(id,content) {
+            const question = $(content).val();
+            const mathFormulaElement = document.getElementById(id);
+
+            // Use BlockMaths to render the mathematical formula
+            BlockMath.render(question, mathFormulaElement);
+        }
+
+        // Listen for changes in the question input
+    </script>
+
+    <script>
+        // Function to generate a random color in hexadecimal format
+        function getRandomColor() {
+            const brightness = 20 + Math.floor(Math.random() * 30); // Adjust brightness (20-50)
+            const saturation = 30 + Math.floor(Math.random() * 40); // Adjust saturation (30-70)
+
+            // Convert brightness and saturation to percentage values
+            const brightnessPercent = brightness + "%";
+            const saturationPercent = saturation + "%";
+
+            // Generate a random hue (0-360 degrees) for variety
+            const hue = Math.floor(Math.random() * 360);
+
+            // Create an HSL color string
+            return `hsl(${hue}, ${saturationPercent}, ${brightnessPercent})`;
+        }
+const levels = [
+
+    {
+        name: 'Tronc commun (Sc)',
+        levelId: 'tc-s',
+        subjects: [
+            {
+                name: 'Mathématiques',
+                key: 'math',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Algèbre' },
+                    { id: 2, name: 'Géométrie' },
+                    { id: 3, name: 'Statistiques et probabilités' },
+                    { id: 4, name: 'Trigonométrie' },
+                    { id: 5, name: 'Calcul différentiel' },
+                    { id: 6, name: 'Calcul intégral' }
+                ]
+            },
+            {
+                name: 'Français',
+                key: 'francais',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Littérature française' },
+                    { id: 2, name: 'Grammaire et conjugaison' },
+                    { id: 3, name: 'Rédaction et expression écrite' },
+                    { id: 4, name: 'Étude de textes littéraires' },
+                    { id: 5, name: 'Analyse de la langue' },
+                    { id: 6, name: 'Histoire de la langue française' }
+                ]
+            },
+            {
+                name: 'Physique-Chimie',
+                key: 'physique-chimie',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Mécanique' },
+                    { id: 2, name: 'Électricité et magnétisme' },
+                    { id: 3, name: 'Optique' },
+                    { id: 4, name: 'Thermodynamique' },
+                    { id: 5, name: 'Cinématique' },
+                    { id: 6, name: 'Chimie organique' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie',
+                key: 'histoire-geographie',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Histoire ancienne' },
+                    { id: 2, name: 'Histoire médiévale' },
+                    { id: 3, name: 'Révolutions du XVIIIe siècle' },
+                    { id: 4, name: 'Géographie physique' },
+                    { id: 5, name: 'Géopolitique mondiale' },
+                    { id: 6, name: 'Histoire contemporaine' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT)',
+                key: 'svt',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Biologie cellulaire' },
+                    { id: 2, name: 'Génétique' },
+                    { id: 3, name: 'Écologie' },
+                    { id: 4, name: 'Évolution des espèces' },
+                    { id: 5, name: 'Anatomie humaine' },
+                    { id: 6, name: 'Sciences de l\'environnement' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Anglais)',
+                key: 'langues-etrangeres',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Compréhension écrite et orale' },
+                    { id: 2, name: 'Expression orale et écrite' },
+                    { id: 3, name: 'Vocabulaire et grammaire' },
+                    { id: 4, name: 'Traduction et interprétation' },
+                    { id: 5, name: 'Culture et civilisation' },
+                    { id: 6, name: 'Conversation et débats' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: 'Tronc commun (L)',
+        levelId: 'tc-l',
+        subjects: [
+            {
+                name: 'Mathématiques',
+                key: 'math',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Algèbre' },
+                    { id: 2, name: 'Géométrie' },
+                    { id: 3, name: 'Statistiques et probabilités' },
+                    { id: 4, name: 'Trigonométrie' },
+                    { id: 5, name: 'Calcul différentiel' },
+                    { id: 6, name: 'Calcul intégral' }
+                ]
+            },
+            {
+                name: 'Français',
+                key: 'francais',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Littérature française' },
+                    { id: 2, name: 'Grammaire et conjugaison' },
+                    { id: 3, name: 'Rédaction et expression écrite' },
+                    { id: 4, name: 'Étude de textes littéraires' },
+                    { id: 5, name: 'Analyse de la langue' },
+                    { id: 6, name: 'Histoire de la langue française' }
+                ]
+            },
+            {
+                name: 'Physique-Chimie',
+                key: 'physique-chimie',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Mécanique' },
+                    { id: 2, name: 'Électricité et magnétisme' },
+                    { id: 3, name: 'Optique' },
+                    { id: 4, name: 'Thermodynamique' },
+                    { id: 5, name: 'Cinématique' },
+                    { id: 6, name: 'Chimie organique' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie',
+                key: 'histoire-geographie',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Histoire ancienne' },
+                    { id: 2, name: 'Histoire médiévale' },
+                    { id: 3, name: 'Révolutions du XVIIIe siècle' },
+                    { id: 4, name: 'Géographie physique' },
+                    { id: 5, name: 'Géopolitique mondiale' },
+                    { id: 6, name: 'Histoire contemporaine' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT)',
+                key: 'svt',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Biologie cellulaire' },
+                    { id: 2, name: 'Génétique' },
+                    { id: 3, name: 'Écologie' },
+                    { id: 4, name: 'Évolution des espèces' },
+                    { id: 5, name: 'Anatomie humaine' },
+                    { id: 6, name: 'Sciences de l\'environnement' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Anglais)',
+                key: 'langues-etrangeres',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Compréhension écrite et orale' },
+                    { id: 2, name: 'Expression orale et écrite' },
+                    { id: 3, name: 'Vocabulaire et grammaire' },
+                    { id: 4, name: 'Traduction et interprétation' },
+                    { id: 5, name: 'Culture et civilisation' },
+                    { id: 6, name: 'Conversation et débats' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '1er Bac (Sc)',
+        levelId: '1bac-s',
+        subjects: [
+            {
+                name: 'Philosophie',
+                key:'philo',
+                color: '#4287f5',
+                Chapters: [
+                    { id: 1, name: 'Théories philosophiques' },
+                    { id: 2, name: 'Philosophie morale' },
+                    { id: 3, name: 'Métaphysique' },
+                    { id: 4, name: 'Éthique et politique' },
+                    { id: 5, name: 'Philosophie de l\'art' },
+                    { id: 6, name: 'Philosophie des sciences' }
+                ]
+            },
+            {
+                name: '(SES)',
+                key:'SES',
+                color: '#ff7675',
+                Chapters: [
+                    { id: 1, name: 'Microéconomie' },
+                    { id: 2, name: 'Macroéconomie' },
+                    { id: 3, name: 'Sociologie' },
+                    { id: 4, name: 'Économie du travail' },
+                    { id: 5, name: 'Économie internationale' },
+                    { id: 6, name: 'Économie du développement' }
+                ]
+            },
+            {
+                name: 'Langue et Littérature',
+                key:'LL',
+                color: '#6ab04c',
+                Chapters: [
+                    { id: 1, name: 'Analyse de textes littéraires' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Grammaire et stylistique' },
+                    { id: 4, name: 'Étude du théâtre' },
+                    { id: 5, name: 'Roman et récit' },
+                    { id: 6, name: 'Poésie et lyrisme' }
+                ]
+            },
+            {
+                name: 'Mathématiques',
+                key:'Maths',
+                color: '#f64747',
+                Chapters: [
+                    { id: 1, name: 'Les Limites' },
+                    { id: 2, name: 'Algèbre linéaire' },
+                    { id: 3, name: 'Probabilités et statistiques' },
+                    { id: 4, name: 'Géométrie avancée' },
+                    { id: 5, name: 'Calcul vectoriel' },
+                    { id: 6, name: 'Équations différentielles' }
+                ]
+            },
+            {
+                name: 'Physique-Chimie',
+                key:'PC',
+                color: '#ffa94d',
+                Chapters: [
+                    { id: 1, name: 'Mécanique quantique' },
+                    { id: 2, name: 'Électromagnétisme avancé' },
+                    { id: 3, name: 'Chimie organique avancée' },
+                    { id: 4, name: 'Cinétique chimique' },
+                    { id: 5, name: 'Thermochimie' },
+                    { id: 6, name: 'Électronique' }
+                ]
+            },
+            {
+                name: 'Espagnol',
+                key:'ESP',
+                color: '#af65a1',
+                Chapters: [
+                    { id: 1, name: 'Compréhension de textes littéraires' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et conversation' },
+                    { id: 4, name: 'Civilisation et culture' },
+                    { id: 5, name: 'Traduction et rédaction spécialisée' },
+                    { id: 6, name: 'Étude de l\'art et de la littérature hispanique' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '1er Bac (L)',
+        levelId: '1bac-l',
+        subjects: [
+            {
+                name: 'Philosophie',
+                key:'philo',
+                color: '#4287f5',
+                Chapters: [
+                    { id: 1, name: 'Théories philosophiques' },
+                    { id: 2, name: 'Philosophie morale' },
+                    { id: 3, name: 'Métaphysique' },
+                    { id: 4, name: 'Éthique et politique' },
+                    { id: 5, name: 'Philosophie de l\'art' },
+                    { id: 6, name: 'Philosophie des sciences' }
+                ]
+            },
+            {
+                name: '(SES)',
+                key:'SES',
+                color: '#ff7675',
+                Chapters: [
+                    { id: 1, name: 'Microéconomie' },
+                    { id: 2, name: 'Macroéconomie' },
+                    { id: 3, name: 'Sociologie' },
+                    { id: 4, name: 'Économie du travail' },
+                    { id: 5, name: 'Économie internationale' },
+                    { id: 6, name: 'Économie du développement' }
+                ]
+            },
+            {
+                name: 'Langue et Littérature',
+                key:'LL',
+                color: '#6ab04c',
+                Chapters: [
+                    { id: 1, name: 'Analyse de textes littéraires' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Grammaire et stylistique' },
+                    { id: 4, name: 'Étude du théâtre' },
+                    { id: 5, name: 'Roman et récit' },
+                    { id: 6, name: 'Poésie et lyrisme' }
+                ]
+            },
+            {
+                name: 'Mathématiques',
+                key:'Maths',
+                color: '#f64747',
+                Chapters: [
+                    { id: 1, name: 'Les Limites' },
+                    { id: 2, name: 'Algèbre linéaire' },
+                    { id: 3, name: 'Probabilités et statistiques' },
+                    { id: 4, name: 'Géométrie avancée' },
+                    { id: 5, name: 'Calcul vectoriel' },
+                    { id: 6, name: 'Équations différentielles' }
+                ]
+            },
+            {
+                name: 'Physique-Chimie',
+                key:'PC',
+                color: '#ffa94d',
+                Chapters: [
+                    { id: 1, name: 'Mécanique quantique' },
+                    { id: 2, name: 'Électromagnétisme avancé' },
+                    { id: 3, name: 'Chimie organique avancée' },
+                    { id: 4, name: 'Cinétique chimique' },
+                    { id: 5, name: 'Thermochimie' },
+                    { id: 6, name: 'Électronique' }
+                ]
+            },
+            {
+                name: 'Espagnol',
+                key:'ESP',
+                color: '#af65a1',
+                Chapters: [
+                    { id: 1, name: 'Compréhension de textes littéraires' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et conversation' },
+                    { id: 4, name: 'Civilisation et culture' },
+                    { id: 5, name: 'Traduction et rédaction spécialisée' },
+                    { id: 6, name: 'Étude de l\'art et de la littérature hispanique' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '2ème Bac (Sc EX)',
+        levelId: '2bac-sx',
+        subjects: [
+            {
+                name: 'Mathématiques Avancées',
+                key:'Maths',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Analyse complexe' },
+                    { id: 2, name: 'Algèbre avancée' },
+                    { id: 3, name: 'Topologie' },
+                    { id: 4, name: 'Probabilités avancées' },
+                    { id: 5, name: 'Logique mathématique' },
+                    { id: 6, name: 'Théorie des nombres' }
+                ]
+            },
+            {
+                name: 'Sciences de l\'Ingénieur',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Mécanique des fluides' },
+                    { id: 2, name: 'Résistance des matériaux' },
+                    { id: 3, name: 'Automatique et régulation' },
+                    { id: 4, name: 'Électrotechnique' },
+                    { id: 5, name: 'Informatique et programmation' },
+                    { id: 6, name: 'Conception mécanique' }
+                ]
+            },
+            {
+                name: 'Philosophie approfondie',
+                key:'Philo',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Philosophie politique' },
+                    { id: 2, name: 'Épistémologie' },
+                    { id: 3, name: 'Philosophie du langage' },
+                    { id: 4, name: 'Philosophie de l\'histoire' },
+                    { id: 5, name: 'Philosophie des sciences sociales' },
+                    { id: 6, name: 'Métaphysique avancée' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie avancée',
+                key:'HG',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Histoire contemporaine approfondie' },
+                    { id: 2, name: 'Géographie humaine' },
+                    { id: 3, name: 'Géopolitique avancée' },
+                    { id: 4, name: 'Histoire de l\'art' },
+                    { id: 5, name: 'Histoire des idées politiques' },
+                    { id: 6, name: 'Géographie économique' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT) approfondies',
+                key:'SVT',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Génétique moléculaire' },
+                    { id: 2, name: 'Biologie moléculaire' },
+                    { id: 3, name: 'Neurobiologie' },
+                    { id: 4, name: 'Biologie évolutive' },
+                    { id: 5, name: 'Paléontologie' },
+                    { id: 6, name: 'Écologie avancée' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Allemand)',
+                key:'Langues',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Littérature allemande' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et débats' },
+                    { id: 4, name: 'Civilisation germanique' },
+                    { id: 5, name: 'Traduction spécialisée' },
+                    { id: 6, name: 'Langue des affaires' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '2ème Bac (Sc PC)',
+        levelId: '2bac-spc',
+        subjects: [
+            {
+                name: 'Mathématiques Avancées',
+                key:'Maths',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Analyse complexe' },
+                    { id: 2, name: 'Algèbre avancée' },
+                    { id: 3, name: 'Topologie' },
+                    { id: 4, name: 'Probabilités avancées' },
+                    { id: 5, name: 'Logique mathématique' },
+                    { id: 6, name: 'Théorie des nombres' }
+                ]
+            },
+            {
+                name: 'Sciences de l\'Ingénieur',
+                key:'SI',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Mécanique des fluides' },
+                    { id: 2, name: 'Résistance des matériaux' },
+                    { id: 3, name: 'Automatique et régulation' },
+                    { id: 4, name: 'Électrotechnique' },
+                    { id: 5, name: 'Informatique et programmation' },
+                    { id: 6, name: 'Conception mécanique' }
+                ]
+            },
+            {
+                name: 'Philosophie approfondie',
+                key:'Philo',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Philosophie politique' },
+                    { id: 2, name: 'Épistémologie' },
+                    { id: 3, name: 'Philosophie du langage' },
+                    { id: 4, name: 'Philosophie de l\'histoire' },
+                    { id: 5, name: 'Philosophie des sciences sociales' },
+                    { id: 6, name: 'Métaphysique avancée' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie avancée',
+                key:'HG',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Histoire contemporaine approfondie' },
+                    { id: 2, name: 'Géographie humaine' },
+                    { id: 3, name: 'Géopolitique avancée' },
+                    { id: 4, name: 'Histoire de l\'art' },
+                    { id: 5, name: 'Histoire des idées politiques' },
+                    { id: 6, name: 'Géographie économique' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT) approfondies',
+                key:'SVT',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Génétique moléculaire' },
+                    { id: 2, name: 'Biologie moléculaire' },
+                    { id: 3, name: 'Neurobiologie' },
+                    { id: 4, name: 'Biologie évolutive' },
+                    { id: 5, name: 'Paléontologie' },
+                    { id: 6, name: 'Écologie avancée' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Allemand)',
+                key:'Langues',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Littérature allemande' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et débats' },
+                    { id: 4, name: 'Civilisation germanique' },
+                    { id: 5, name: 'Traduction spécialisée' },
+                    { id: 6, name: 'Langue des affaires' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '2ème Bac (Sc SMA)',
+        levelId: '2bac-ssma',
+        subjects: [
+            {
+                name: 'Mathématiques Avancées',
+                key: 'Maths',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Analyse complexe' },
+                    { id: 2, name: 'Algèbre avancée' },
+                    { id: 3, name: 'Topologie' },
+                    { id: 4, name: 'Probabilités avancées' },
+                    { id: 5, name: 'Logique mathématique' },
+                    { id: 6, name: 'Théorie des nombres' }
+                ]
+            },
+            {
+                name: 'Sciences de l\'Ingénieur',
+                key: 'SI',
+                color: '#b449ff',
+                Chapters: [
+                    { id: 1, name: 'Mécanique des fluides' },
+                    { id: 2, name: 'Résistance des matériaux' },
+                    { id: 3, name: 'Automatique et régulation' },
+                    { id: 4, name: 'Électrotechnique' },
+                    { id: 5, name: 'Informatique et programmation' },
+                    { id: 6, name: 'Conception mécanique' }
+                ]
+            },
+            {
+                name: 'Philosophie approfondie',
+                key: 'Philo',
+                color: '#00825d',
+                Chapters: [
+                    { id: 1, name: 'Philosophie politique' },
+                    { id: 2, name: 'Épistémologie' },
+                    { id: 3, name: 'Philosophie du langage' },
+                    { id: 4, name: 'Philosophie de l\'histoire' },
+                    { id: 5, name: 'Philosophie des sciences sociales' },
+                    { id: 6, name: 'Métaphysique avancée' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie avancée',
+                key: 'HG',
+                color: '#6ab04c',
+                Chapters: [
+                    { id: 1, name: 'Histoire contemporaine approfondie' },
+                    { id: 2, name: 'Géographie humaine' },
+                    { id: 3, name: 'Géopolitique avancée' },
+                    { id: 4, name: 'Histoire de l\'art' },
+                    { id: 5, name: 'Histoire des idées politiques' },
+                    { id: 6, name: 'Géographie économique' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT) approfondies',
+                key: 'SVT',
+                color: '#ff7675',
+                Chapters: [
+                    { id: 1, name: 'Génétique moléculaire' },
+                    { id: 2, name: 'Biologie moléculaire' },
+                    { id: 3, name: 'Neurobiologie' },
+                    { id: 4, name: 'Biologie évolutive' },
+                    { id: 5, name: 'Paléontologie' },
+                    { id: 6, name: 'Écologie avancée' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Allemand)',
+                key: 'Ang',
+                color: '#ffa94d',
+                Chapters: [
+                    { id: 1, name: 'Littérature allemande' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et débats' },
+                    { id: 4, name: 'Civilisation germanique' },
+                    { id: 5, name: 'Traduction spécialisée' },
+                    { id: 6, name: 'Langue des affaires' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '2ème Bac (Sc SMB)',
+        levelId: '2bac-ssmb',
+        subjects: [
+            {
+                name: 'Mathématiques Avancées',
+                key: 'Maths',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Analyse complexe' },
+                    { id: 2, name: 'Algèbre avancée' },
+                    { id: 3, name: 'Topologie' },
+                    { id: 4, name: 'Probabilités avancées' },
+                    { id: 5, name: 'Logique mathématique' },
+                    { id: 6, name: 'Théorie des nombres' }
+                ]
+            },
+            {
+                name: 'Sciences de l\'Ingénieur',
+                key: 'SI',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Mécanique des fluides' },
+                    { id: 2, name: 'Résistance des matériaux' },
+                    { id: 3, name: 'Automatique et régulation' },
+                    { id: 4, name: 'Électrotechnique' },
+                    { id: 5, name: 'Informatique et programmation' },
+                    { id: 6, name: 'Conception mécanique' }
+                ]
+            },
+            {
+                name: 'Philosophie approfondie',
+                key: 'Philo',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Philosophie politique' },
+                    { id: 2, name: 'Épistémologie' },
+                    { id: 3, name: 'Philosophie du langage' },
+                    { id: 4, name: 'Philosophie de l\'histoire' },
+                    { id: 5, name: 'Philosophie des sciences sociales' },
+                    { id: 6, name: 'Métaphysique avancée' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie avancée',
+                key: 'HG',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Histoire contemporaine approfondie' },
+                    { id: 2, name: 'Géographie humaine' },
+                    { id: 3, name: 'Géopolitique avancée' },
+                    { id: 4, name: 'Histoire de l\'art' },
+                    { id: 5, name: 'Histoire des idées politiques' },
+                    { id: 6, name: 'Géographie économique' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT) approfondies',
+                key: 'SVT',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Génétique moléculaire' },
+                    { id: 2, name: 'Biologie moléculaire' },
+                    { id: 3, name: 'Neurobiologie' },
+                    { id: 4, name: 'Biologie évolutive' },
+                    { id: 5, name: 'Paléontologie' },
+                    { id: 6, name: 'Écologie avancée' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Allemand)',
+                key: 'Lang',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Littérature allemande' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et débats' },
+                    { id: 4, name: 'Civilisation germanique' },
+                    { id: 5, name: 'Traduction spécialisée' },
+                    { id: 6, name: 'Langue des affaires' }
+                ]
+            }
+        ]
+    },
+    
+    {
+        name: '2ème Bac (L)',
+        levelId: '2bac-l',
+        subjects: [
+            {
+                name: 'Mathématiques Avancées',
+                key: 'Maths',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Analyse complexe' },
+                    { id: 2, name: 'Algèbre avancée' },
+                    { id: 3, name: 'Topologie' },
+                    { id: 4, name: 'Probabilités avancées' },
+                    { id: 5, name: 'Logique mathématique' },
+                    { id: 6, name: 'Théorie des nombres' }
+                ]
+            },
+            {
+                name: 'Sciences de l\'Ingénieur',
+                key: 'SI',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Mécanique des fluides' },
+                    { id: 2, name: 'Résistance des matériaux' },
+                    { id: 3, name: 'Automatique et régulation' },
+                    { id: 4, name: 'Électrotechnique' },
+                    { id: 5, name: 'Informatique et programmation' },
+                    { id: 6, name: 'Conception mécanique' }
+                ]
+            },
+            {
+                name: 'Philosophie approfondie',
+                key: 'Philo',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Philosophie politique' },
+                    { id: 2, name: 'Épistémologie' },
+                    { id: 3, name: 'Philosophie du langage' },
+                    { id: 4, name: 'Philosophie de l\'histoire' },
+                    { id: 5, name: 'Philosophie des sciences sociales' },
+                    { id: 6, name: 'Métaphysique avancée' }
+                ]
+            },
+            {
+                name: 'Histoire-Géographie avancée',
+                key: 'HG',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Histoire contemporaine approfondie' },
+                    { id: 2, name: 'Géographie humaine' },
+                    { id: 3, name: 'Géopolitique avancée' },
+                    { id: 4, name: 'Histoire de l\'art' },
+                    { id: 5, name: 'Histoire des idées politiques' },
+                    { id: 6, name: 'Géographie économique' }
+                ]
+            },
+            {
+                name: 'Sciences de la Vie et de la Terre (SVT) approfondies',
+                key: 'SVT',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Génétique moléculaire' },
+                    { id: 2, name: 'Biologie moléculaire' },
+                    { id: 3, name: 'Neurobiologie' },
+                    { id: 4, name: 'Biologie évolutive' },
+                    { id: 5, name: 'Paléontologie' },
+                    { id: 6, name: 'Écologie avancée' }
+                ]
+            },
+            {
+                name: 'Langues étrangères (ex: Allemand)',
+                key: 'Lang',
+                color: getRandomColor(),
+                Chapters: [
+                    { id: 1, name: 'Littérature allemande' },
+                    { id: 2, name: 'Expression écrite avancée' },
+                    { id: 3, name: 'Langue orale et débats' },
+                    { id: 4, name: 'Civilisation germanique' },
+                    { id: 5, name: 'Traduction spécialisée' },
+                    { id: 6, name: 'Langue des affaires' }
+                ]
+            }
+        ]
+    },
+];
+
+function populateLevelsAndSubjects() {
+    const quizLevelSelect = document.getElementById("quizLevel");
+    const quizSubjectSelect = document.getElementById("quizSubject");
+    const quizCourseSelect = document.getElementById("quizCourse");
+    const subjectDropdownGroup = document.getElementById("subjectDropdownGroup");
+    const courseDropdownGroup = document.getElementById("courseDropdownGroup");
+
+    levels.forEach(level => {
+        const option = document.createElement("option");
+        option.value = level.levelId;
+        option.textContent = level.name;
+        quizLevelSelect.appendChild(option);
+    });
+
+    quizLevelSelect.addEventListener("change", function () {
+        const selectedLevelId = this.value;
+
+        quizSubjectSelect.innerHTML = '<option value="" disabled selected>Select a subject</option>';
+        quizCourseSelect.innerHTML = '<option value="" disabled selected>Select a course</option>';
+
+        const selectedLevel = levels.find(level => level.levelId === selectedLevelId);
+
+        if (selectedLevel) {
+            selectedLevel.subjects.forEach(subject => {
+                const option = document.createElement("option");
+                option.value = subject.key;
+                option.textContent = subject.name;
+                quizSubjectSelect.appendChild(option);
+
+                // You can also populate the chapters here if needed
+                const chapters = subject.Chapters;
+                // Populate chapters based on the selected subject
+                // ...
+            });
+
+            subjectDropdownGroup.style.display = "block";
+        } else {
+            subjectDropdownGroup.style.display = "none";
+        }
+    });
+
+    quizSubjectSelect.addEventListener("change", function () {
+        const selectedSubjectKey = this.value;
+
+        quizCourseSelect.innerHTML = '<option value="" disabled selected>Select a course</option>';
+
+        if (selectedSubjectKey) {
+            const selectedLevel = levels.find(level => level.levelId === quizLevelSelect.value);
+            const selectedSubject = selectedLevel.subjects.find(subject => subject.key === selectedSubjectKey);
+
+            selectedSubject.Chapters.forEach(chapter => {
+                const option = document.createElement("option");
+                option.value = chapter.id;
+                option.textContent = chapter.name;
+                quizCourseSelect.appendChild(option);
+            });
+
+            courseDropdownGroup.style.display = "block";
+        } else {
+            courseDropdownGroup.style.display = "none";
+        }
+    });
+}
+
+
+        // Call the function to populate levels and subjects
+        populateLevelsAndSubjects();
+    </script>
+</body>
+</html>
