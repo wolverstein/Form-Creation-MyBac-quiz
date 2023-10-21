@@ -13,6 +13,9 @@
             margin: 5px 0;
         }
     </style>
+
+<script src="https://editor.codecogs.com/eqneditor.api.min.js" 
+crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="container">
@@ -47,6 +50,7 @@
                 <label for="quizTime">Durée :</label>
                 <input type="text" class="form-control" id="quizTime" required>
             </div>
+            
             <div class="form-group">
                 <label for="quizDifficulty">Difficulté :</label>
                 <select class="form-control" id="quizDifficulty" required>
@@ -66,6 +70,7 @@
             </div>
             
             <button type="button" class="btn btn-primary" id="add-question">Ajouter une question</button>
+            
             <button type="button" class="btn btn-danger" id="generate-quiz">Générer le Quiz JSON</button>
             <a id="download-link" style="display: none" download="quiz.json" class="btn btn-success">Télécharger le Quiz</a>
             <hr class="select-divider">
@@ -78,13 +83,86 @@
             </div>
         </form>
         <br><br><br><br>
-    </div>
-    
+
+<div id="toolbar"></div>
+<div id="latexInput"></div>
+<img id="output"/>
+<script type="text/javascript">
+    textarea = new EqEditor.TextArea('latexInput')
+      .addToolbar(new EqEditor.Toolbar('toolbar'), true)
+      .addOutput(new EqEditor.Output('output'));
+</script>
+<div id="input" placeholder="Write LaTeX here"></div>
+<script>
+var ta = new EqEditor.TextArea('input', true);
+</script>
+<br><br><br><br><br><br><br><br><br>
+
+
+          
+        
+          <script>
+              const equationInput = document.getElementById("equationInput").value;
+              const renderedEquation = document.getElementById("renderedEquation");
+            function convertEquation() {
+        
+              if (equationInput.trim() === "") {
+                renderedEquation.innerHTML = "";
+              } else {
+                MathJax.texReset();
+                MathJax.typesetClear();
+                MathJax.typesetPromise([renderedEquation, equationInput])
+                  .catch((error) => {
+                    renderedEquation.innerHTML = "Error: " + error.message;
+                  });
+              }
+            }
+        
+            function generateExportedEquation() {
+              const equationInput = document.getElementById("equationInput").value;
+              // You can use equationInput for exporting or further processing
+              renderedEquation.innerHTML=convertEquation();
+              alert("Exported Equation: " + equationInput);
+            }
+          </script>
+          <script type="text/javascript" async
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+      </script>
+      <style>
+        .equation-container {
+          border: 1px solid #ddd;
+          padding: 10px;
+          width: 300px;
+        }
+      </style>
 
     <!-- Add Bootstrap JS and jQuery scripts here if needed -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        function convertEquation() {
+          const equationInput = document.getElementById("equationInput").value;
+          const renderedEquation = document.getElementById("renderedEquation");
+    
+          if (equationInput.trim() === "") {
+            renderedEquation.innerHTML = "";
+          } else {
+            MathJax.texReset();
+            MathJax.typesetClear();
+            MathJax.typesetPromise([renderedEquation, equationInput])
+              .catch((error) => {
+                renderedEquation.innerHTML = "Error: " + error.message;
+              });
+          }
+        }
+    </script>
+
     <script>
         // Initialize question counter
         let questionCounter = 0;
@@ -115,6 +193,10 @@
                 const questionField = `
                 <hr>
                     <div class="form-group">
+                        <div class="form-group">
+                            <label for="mathFormula${questionCounter}">Mathematical Formula:</label>
+                            <div id="mathFormula" style="border: 1px solid #ccc; padding: 5px;"></div>
+                        </div>
                         <label for="question${questionCounter}">Question ${questionCounter}:</label>
                         <input type="text" class="form-control" id="question${questionCounter}" required>
                         <label for="answers${questionCounter}">Answers:</label>
@@ -157,6 +239,8 @@
                 });
             }
             updateQuizzesList(); // Update the list of quizzes
+
+            document.getElementById(`question${questionCounter}`).addEventListener("input",updateMathFormula(document.getElementById(`question${questionCounter}`).value,`mathFormula${questionCounter}`))
         });
 
         // Generate JSON when the "Generate Quiz JSON" button is clicked
@@ -169,6 +253,7 @@
                 "difficulty": $("#quizDifficulty").val(),
                 "subject": $("#quizSubject").val(),
                 "Description": $("#quizDescription").val(),
+                "course": $("#quizCourse").val(),
                 "questions": []
             };
 
@@ -213,6 +298,19 @@
         // Add a click event listener for the "Export All Quizzes" button
         const exportButton = document.getElementById("export-quizzes");
         exportButton.addEventListener("click", exportQuizzes);
+
+        // When the document is ready
+
+        // Function to update the BlockMaths rendering
+        function updateMathFormula(id,content) {
+            const question = $(content).val();
+            const mathFormulaElement = document.getElementById(id);
+
+            // Use BlockMaths to render the mathematical formula
+            BlockMath.render(question, mathFormulaElement);
+        }
+
+        // Listen for changes in the question input
     </script>
 
     <script>
